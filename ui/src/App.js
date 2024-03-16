@@ -1,4 +1,4 @@
-import MainScreen from "./components/MainScreen/MainScreen.component";
+import MainScreen from "./Components/MainScreen/MainScreen.component";
 import firepadRef, { db, userName } from "./server/firebase";
 import "./App.css";
 import { useEffect } from "react";

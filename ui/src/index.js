@@ -6,13 +6,11 @@ import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import { userReducer } from "./store/reducer";
-import { MainPage } from "./components/MainPage/MainPage.component";
 
 export const store = createStore(userReducer);
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      {/* <MainPage /> */}
       <App />
     </Provider>
   </React.StrictMode>,
