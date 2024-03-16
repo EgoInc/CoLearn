@@ -1,0 +1,32 @@
+.main-screen {
+    width: 100%;
+    height: 70vh;
+    background: #3c4043;
+}
+
+.mainScreen-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+.mainScreen-wrapper {
+    width: 50%;
+}
+
+.wrapper-board {
+    width: 50%;
+}
+
+.footer {
+    height: 10vh;
+}
+
+.img-container {
+    background-color: #3c4043;
+    height: 20vh;
+}
+
+.img-container img {
+    max-width: 100%;
+}
