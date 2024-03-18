@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import MeetingFooter from "../MeetingFooter/MeetingFooter.component";
 import Participants from "../Participants/Participants.component";
 import "./MainScreen.css";
@@ -8,6 +8,12 @@ import PaintingBoard from "../PaintingBoard/PaintingBoard.component";
 import TaskImg from "../../assets/taskImg.jpg";
 
 const MainScreen = (props) => {
+  const [imageData, setImageData] = useState(null);
+  useEffect(() => {
+    const base64String = localStorage.getItem("imageData");
+    setImageData(base64String);
+  }, []);
+
   const participantRef = useRef(props.participants);
 
   const onMicClick = (micEnabled) => {
@@ -78,7 +84,13 @@ const MainScreen = (props) => {
     <div className="mainScreen-container">
       <div className="mainScreen-wrapper">
         <div className="img-container">
-          <img src={TaskImg} />
+          {imageData && (
+            <img
+              src={imageData}
+              className="img-container_img"
+              alt="Изображение"
+            />
+          )}
         </div>
         <div className="main-screen">
           <Participants />

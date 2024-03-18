@@ -14,10 +14,10 @@
     cursor: pointer;
     border-radius: 4px;
     -webkit-appearance: none;
-    border: 2px solid antiquewhite;
     height: 30px;
     width: 60px;
     margin-left: 18px;
+    background-color: #3c4043;
 }
 
 .modeBut {
@@ -41,4 +41,11 @@
 
 .controls {
     display: flex;
+}
+
+.text-mode-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
 }

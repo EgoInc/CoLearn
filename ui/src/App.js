@@ -1,7 +1,7 @@
 import MainScreen from "./Components/MainScreen/MainScreen.component";
 import firepadRef, { db, userName } from "./server/firebase";
 import "./App.css";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import {
   setMainStream,
   addParticipant,
@@ -13,7 +13,6 @@ import { connect } from "react-redux";
 
 function App(props) {
   const getUserStream = async () => {
-	  console.log("navi", navigator)
     const localStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: true,
@@ -21,6 +20,7 @@ function App(props) {
 
     return localStream;
   };
+
   useEffect(async () => {
     const stream = await getUserStream();
     stream.getVideoTracks()[0].enabled = false;

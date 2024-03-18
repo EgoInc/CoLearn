@@ -1,0 +1,74 @@
+.MainPage_buttonsContainer {
+    margin: auto;
+    margin-top: 9rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 1px 0px 23px 11px rgba(113, 151, 179, 0.2);
+    width: 25rem;
+    padding: 3rem 0rem;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    border-radius: 0.5rem;
+}
+
+.MainPage_button {
+    width: 60%;
+    border-radius: 0.5rem;
+    padding: 10px 40px;
+    border: solid 0.5px rgba(113, 151, 179, 0.2);
+    background-color: white;
+    color: rgb(15, 68, 105);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.MainPage_button:hover {
+    background-color: rgb(15, 68, 105);
+    color: white;
+}
+
+.MainPage_inputsContainer {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.MainPage_inputContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+}
+
+.MainPage_input {
+    width: 80%;
+    border-radius: 0.5rem;
+    padding: 8px 0;
+    padding-left: 10px;
+    border: solid 0.5px rgba(113, 151, 179, 0.2);
+    background-color: white;
+    color: rgb(15, 68, 105);
+    font-weight: 500;
+}
+
+.MainPage_inputFile {
+    width: 100%;
+    border-radius: 0.5rem;
+    padding: 8px 0;
+    border: solid 0.5px rgba(113, 151, 179, 0.2);
+    background-color: white;
+    color: rgb(15, 68, 105);
+    font-weight: 500;
+}
+
+.MainPage_inputContainer button {
+    border-radius: 0.5rem;
+    border: solid 0.5px rgba(113, 151, 179, 0.2);
+    background-color: white;
+    color: rgb(15, 68, 105);
+    font-weight: 500;
+    cursor: pointer;
+    padding-top: 4px;
+}

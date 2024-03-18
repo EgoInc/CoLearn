@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import io from "socket.io-client";
 import "./Canvas.css";
 
@@ -9,17 +10,31 @@ const Canvas = () => {
     mode: "draw",
   });
   const [textMode, setTextMode] = useState(false); // Состояние для отслеживания режима ввода текста
-  let sessionId = localStorage.getItem("RoomID");
+
+  let { sessionId } = useParams();
 
   const changeColor = (newColor) => {
     canvasDetails.color = newColor;
   };
 
+  const drawLocalImage = () => {
+    const localSavedImage = sessionStorage.getItem("canvasImage");
+    if (localSavedImage) {
+      if (localSavedImage) {
+        const image = new Image();
+        image.src = localSavedImage;
+        image.onload = () => {
+          context.drawImage(image, 0, 0);
+        };
+      }
+    }
+    const canvas = document.getElementById("canvas");
+    const context = canvas.getContext("2d");
+  };
+
   useEffect(() => {
     console.log("HERE", sessionId);
-    if (process.env.NODE_ENV === "development") {
-      canvasDetails.socketUrl = "https://13.42.37.29:5000";
-    }
+    canvasDetails.socketUrl = `${process.env.REACT_APP_ADDR}:5000`;
     console.log("socketUrl", canvasDetails.socketUrl);
     canvasDetails.socket = io.connect(canvasDetails.socketUrl, {
       query: {
@@ -43,6 +58,7 @@ const Canvas = () => {
         const context = canvas.getContext("2d");
         image.src = data;
         image.addEventListener("load", () => {
+          console.log();
           context.drawImage(image, 0, 0);
         });
       });
@@ -50,6 +66,7 @@ const Canvas = () => {
   }, []);
 
   useEffect(() => {
+    drawLocalImage();
     const mouseMoveHandler = (e, type) => {
       const event = type === "touch" ? e.touches[0] : e;
       if (canvasDetails.mode === "draw") {
@@ -91,6 +108,7 @@ const Canvas = () => {
     const onSave = () => {
       if (!canvasDetails.waiting) {
         const base64EncodedUrl = canvas.toDataURL("image/png");
+        sessionStorage.setItem("canvasImage", base64EncodedUrl);
         canvasDetails.socket.emit("image-data", {
           sessionId: sessionId,
           imageData: base64EncodedUrl,
@@ -119,6 +137,7 @@ const Canvas = () => {
       context.fillStyle = canvasDetails.color; // Устанавливаем цвет текста
       context.font = "20px Arial"; // Устанавливаем шрифт и размер текста
       context.fillText(text, x, y); // Отрисовываем текст на холсте
+      onSave();
     };
 
     const findxy = (res, e) => {
@@ -163,10 +182,9 @@ const Canvas = () => {
     };
   }, [textMode]);
 
-  const toggleTextMode = () => {
-    const newMode = canvasDetails.mode === "draw" ? "text" : "draw";
-    setTextMode(newMode === "text");
-    canvasDetails.mode = newMode;
+  const handleModeChange = (mode) => {
+    setTextMode(mode === "text");
+    canvasDetails.mode = mode;
   };
 
   return (
@@ -181,11 +199,29 @@ const Canvas = () => {
           />
         </div>
         <div className="text-mode-toggle">
-          <button onClick={toggleTextMode} className="modeBut">
-            {textMode ? "РИСОВАНИЕ" : "ТЕКСТ"}
-          </button>
+          <label>
+            <input
+              type="radio"
+              name="mode"
+              value="draw"
+              checked={!textMode}
+              onChange={() => handleModeChange("draw")}
+            />
+            Рисование
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="mode"
+              value="text"
+              checked={textMode}
+              onChange={() => handleModeChange("text")}
+            />
+            Текст
+          </label>
         </div>
       </div>
+
       <canvas className="canvas" id="canvas"></canvas>
     </div>
   );

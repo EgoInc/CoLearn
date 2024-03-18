@@ -13,11 +13,12 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.4",
+    "react-router-dom": "^6.22.3",
     "react-scripts": "4.0.3",
     "react-tooltip": "^4.2.21",
     "redux": "^4.1.0",
-    "web-vitals": "^1.1.2",
-    "socket.io-client": "^4.4.0"
+    "socket.io-client": "^4.4.0",
+    "web-vitals": "^1.1.2"
   },
   "scripts": {
     "start": "HTTPS=true SSL_CRT_FILE=./13.42.37.29.pem SSL_KEY_FILE=./13.42.37.29-key.pem react-scripts --openssl-legacy-provider start",
