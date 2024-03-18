@@ -13,6 +13,7 @@ import { connect } from "react-redux";
 
 function App(props) {
   const getUserStream = async () => {
+	  console.log("navi", navigator)
     const localStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: true,

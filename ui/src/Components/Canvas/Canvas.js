@@ -18,7 +18,7 @@ const Canvas = () => {
   useEffect(() => {
     console.log("HERE", sessionId);
     if (process.env.NODE_ENV === "development") {
-      canvasDetails.socketUrl = "http://localhost:5000";
+      canvasDetails.socketUrl = "https://13.42.37.29:5000";
     }
     console.log("socketUrl", canvasDetails.socketUrl);
     canvasDetails.socket = io.connect(canvasDetails.socketUrl, {
