@@ -6,8 +6,8 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 
 const option = {
-        key: fs.readFileSync("./13.42.37.29-key.pem"),
-        cert: fs.readFileSync("./13.42.37.29.pem")
+        key: fs.readFileSync("./3.8.202.227-key.pem"),
+        cert: fs.readFileSync("./3.8.202.227.pem")
 }
 
 const port = 5000;
@@ -79,22 +79,21 @@ io.on('connection', (socket) => {
     });
 });
 
-console.log('server env', process.env.NODE_ENV)
-expressApp.use(express.static(path.join(__dirname, '../ui/build')));
-expressApp.get('*', function (req, res) {
-    console.log('response received');
-    res.sendFile(path.join(__dirname, '../ui/build', 'index.html'));
+
+expressApp.get('/', function (req, res) {
+     res.send("WELCOME TO CoLearning! /n We are happy to see you here. Open https://13.42.37.29:3000 to start CoLearning session");   
+   
 });  
 
 expressApp.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Credentials', true);
     next();
 });
 
-expressApp.use(bodyParser.json());
+expressApp.use(bodyParser.json({limit: '50mb'}));
 expressApp.post('/upload-task-image', (req, res) => {
     console.log("Knock")
     const sessionId = req.body.sessionId;
@@ -110,6 +109,6 @@ expressApp.post('/upload-task-image', (req, res) => {
 });
 
 
-httpServer.listen(port, () => {
-    console.log('Server running at', port)
-});
+
+
+
