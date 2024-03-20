@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import io from "socket.io-client";
 import "./Canvas.css";
+const socketIOStream = require('socket.io-stream');
 
 const Canvas = () => {
   const { current: canvasDetails } = useRef({
@@ -10,8 +11,13 @@ const Canvas = () => {
     mode: "draw",
   });
   const [textMode, setTextMode] = useState(false); // Состояние для отслеживания режима ввода текста
+  const urlparams = new URLSearchParams(window.location.search);
+  
+  const sessionId = urlparams.get("id");
 
-  let { sessionId } = useParams();
+  let roomData = JSON.parse(sessionStorage.getItem(sessionId));
+  console.log("Roomdata", roomData)
+  let taskImage = roomData.image;
 
   const changeColor = (newColor) => {
     canvasDetails.color = newColor;
@@ -33,37 +39,72 @@ const Canvas = () => {
   };
 
   useEffect(() => {
-    console.log("HERE", sessionId);
+    console.log("Start canvas session with", sessionId);
     canvasDetails.socketUrl = `${process.env.REACT_APP_ADDR}:5000`;
-    console.log("socketUrl", canvasDetails.socketUrl);
+    console.log("Подключаемся к", `${process.env.REACT_APP_ADDR}:5000`)
     canvasDetails.socket = io.connect(canvasDetails.socketUrl, {
-      query: {
-        sessionId: sessionId,
-      },
-      // Обработчик подключения
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      transports: ["websocket"],
+        query: {
+            sessionId: sessionId
+        },
+        // Обработчик подключения
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        transports: ["websocket"],
     });
 
     canvasDetails.socket.on("connect", () => {
-      console.log("Connected to server");
-
-      // Обработчик для получения данных изображения от сервера
-      canvasDetails.socket.on("image-data", (data) => {
-        console.log("Передаю рисуночки");
-        const image = new Image();
-        const canvas = document.getElementById("canvas");
-        const context = canvas.getContext("2d");
-        image.src = data;
-        image.addEventListener("load", () => {
-          console.log();
-          context.drawImage(image, 0, 0);
+        console.log("Connected to server");
+        // Обработчик для получения данных изображения от сервера
+        canvasDetails.socket.on("image-data", (data) => {
+            const image = new Image();
+            const canvas = document.getElementById("canvas");
+            const context = canvas.getContext("2d");
+            image.src = data;
+            image.addEventListener("load", () => {
+                context.drawImage(image, 0, 0);
+            });
         });
+
+        // Обработчик для получения текущего задания
+        canvasDetails.socket.on("current-task", (taskImg) => {
+          // Если taskImg пустая строка, запросить изображение задания
+          if (taskImg === "") {
+            console.log("Запрос на передачу изображения задания...");
+            fetch(`${process.env.REACT_APP_ADDR}:5000/upload-task-image`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sessionId: sessionId,
+                    taskImage: taskImage,
+                }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Изображение задания успешно отправлено на сервер.');
+                    return response.text();
+                } else {
+                    throw new Error('Ошибка при отправке изображения задания.');
+                }
+            })
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Произошла ошибка:', error.message);
+            });
+        } else {
+              console.log("Получено изображение");
+              // Обновляем изображение задания
+              roomData.image = taskImg;
+              sessionStorage.setItem(sessionId, JSON.stringify(roomData));
+
+          }
       });
-    });
-  }, []);
+  });
+}, []);
 
   useEffect(() => {
     drawLocalImage();
@@ -78,7 +119,11 @@ const Canvas = () => {
       if (textMode) {
         const text = prompt("Введите текст:");
         if (text) {
-          drawText(event.clientX, event.clientY, text);
+          prevX = currX;
+          prevY = currY;
+          currX = e.clientX - canvas.offsetLeft;
+          currY = e.clientY - canvas.offsetTop;
+          drawText(currX, currY, text);
         }
       } else {
         if (canvasDetails.mode === "draw") {
@@ -124,6 +169,7 @@ const Canvas = () => {
       context.beginPath();
       context.moveTo(prevX, prevY);
       context.lineTo(currX, currY);
+      console.log(prevX, prevY)
       context.strokeStyle = canvasDetails.color;
       context.lineCap = "round";
       context.lineJoin = "round";
@@ -136,6 +182,7 @@ const Canvas = () => {
     const drawText = (x, y, text) => {
       context.fillStyle = canvasDetails.color; // Устанавливаем цвет текста
       context.font = "20px Arial"; // Устанавливаем шрифт и размер текста
+      console.log(x, y)
       context.fillText(text, x, y); // Отрисовываем текст на холсте
       onSave();
     };

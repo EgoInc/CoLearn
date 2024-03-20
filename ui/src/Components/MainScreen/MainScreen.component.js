@@ -5,14 +5,28 @@ import "./MainScreen.css";
 import { connect } from "react-redux";
 import { setMainStream, updateUser } from "../../store/actioncreator";
 import PaintingBoard from "../PaintingBoard/PaintingBoard.component";
-import TaskImg from "../../assets/taskImg.jpg";
 
 const MainScreen = (props) => {
   const [imageData, setImageData] = useState(null);
   useEffect(() => {
-    const base64String = localStorage.getItem("imageData");
-    setImageData(base64String);
-  }, []);
+    const urlparams = new URLSearchParams(window.location.search);
+    const sessionId = urlparams.get("id");
+    const roomDataString = sessionStorage.getItem(sessionId);
+
+    // Проверяем, что строка JSON не пустая
+    if (roomDataString) {
+      // Преобразуем строку JSON обратно в объект JavaScript
+      const roomData = JSON.parse(roomDataString);
+
+      // Получаем значение image из объекта roomData
+      const image = roomData.image;
+
+      // Делаем что-то с полученным значением image
+      setImageData(image);
+    } else {
+      console.error(`Элемент с ключом ${sessionId} не найден в sessionStorage.`);
+    }
+  });
 
   const participantRef = useRef(props.participants);
 

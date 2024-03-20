@@ -14,20 +14,31 @@ var firepadRef = firebase.database().ref();
 // export const userName = prompt("What's your name?");
 export const userName = localStorage.getItem("nickname") || "DefaultName";
 console.log(
-  'localStorage.getItem("nickname")',
+  'Загружаем сохраненного пользователя',
   localStorage.getItem("nickname")
 );
 const urlparams = new URLSearchParams(window.location.search);
-console.log("urlparams", urlparams, window.location.search);
 const roomId = urlparams.get("id");
-console.log("roomId", roomId);
-localStorage.setItem("RoomID", roomId);
+sessionStorage.setItem("RoomID", roomId);
 if (roomId) {
   firepadRef = firepadRef.child(roomId);
+  // Создаем объект для хранения данных комнаты
+  const roomData = {
+    "image": sessionStorage.getItem("imageData"),
+    "localDesk": ""
+  }
+  sessionStorage.setItem(roomId, JSON.stringify(roomData));
+  // sessionStorage.removeItem("imageData")
 } else {
   const pathname = window.location.pathname;
   if (pathname.includes("/meeting/")) {
     firepadRef = firepadRef.push();
+    // Создаем объект для хранения данных комнаты
+    const roomData = {
+      "image": sessionStorage.getItem("imageData"),
+      "localDesk": ""
+    }
+    sessionStorage.setItem(firepadRef.key, JSON.stringify(roomData));
     window.history.replaceState(null, "Meet", "?id=" + firepadRef.key);
   }
 }

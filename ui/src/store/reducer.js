@@ -39,14 +39,11 @@ const generateColor = () =>
   "#" + Math.floor(Math.random() * 16777215).toString(16);
 
 export const userReducer = (state = defaultUserState, action) => {
-  console.log("userReducer", state, action);
   if (action.type === SET_MAIN_STREAM) {
-    console.log("1");
     let payload = action.payload;
     state = { ...state, ...payload };
     return state;
   } else if (action.type === ADD_PARTICIPANT) {
-    console.log("2");
     let payload = action.payload;
     const currentUserId = Object.keys(state.currentUser)[0];
     const newUserId = Object.keys(payload.newUser)[0];
@@ -65,7 +62,6 @@ export const userReducer = (state = defaultUserState, action) => {
     state = { ...state, participants };
     return state;
   } else if (action.type === SET_USER) {
-    console.log("3");
 
     let payload = action.payload;
     let participants = { ...state.participants };
@@ -75,7 +71,6 @@ export const userReducer = (state = defaultUserState, action) => {
     state = { ...state, currentUser: { ...payload.currentUser }, participants };
     return state;
   } else if (action.type === REMOVE_PARTICIPANT) {
-    console.log("4");
 
     let payload = action.payload;
     let participants = { ...state.participants };
@@ -83,7 +78,6 @@ export const userReducer = (state = defaultUserState, action) => {
     state = { ...state, participants };
     return state;
   } else if (action.type === UPDATE_USER) {
-    console.log("5");
 
     let payload = action.payload;
     const userId = Object.keys(state.currentUser)[0];
@@ -98,8 +92,6 @@ export const userReducer = (state = defaultUserState, action) => {
     };
     return state;
   } else if (action.type === UPDATE_PARTICIPANT) {
-    console.log("6");
-
     let payload = action.payload;
     const newUserId = Object.keys(payload.newUser)[0];
 

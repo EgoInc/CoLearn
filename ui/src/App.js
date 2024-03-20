@@ -1,7 +1,7 @@
-import MainScreen from "./Components/MainScreen/MainScreen.component";
+import MainScreen from "./components/MainScreen/MainScreen.component";
 import firepadRef, { db, userName } from "./server/firebase";
 import "./App.css";
-import { useEffect, useContext } from "react";
+import { useEffect } from "react";
 import {
   setMainStream,
   addParticipant,
@@ -12,38 +12,73 @@ import {
 import { connect } from "react-redux";
 
 function App(props) {
-  const getUserStream = async () => {
-    const localStream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: true,
-    });
 
-    return localStream;
+  const getUserStream = async () => {
+    try {
+      const localStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true, // Попробуйте запросить видео
+      });
+  
+      return localStream;
+    } catch (error) {
+      // Обработка ошибки{
+        console.log('Доступ к камере отклонен или камера не обнаружена.');
+        // Здесь вы можете предложить альтернативные варианты или просто не запрашивать видеопоток
+        return null; // Возвращаем null, чтобы показать, что поток не доступен
+    }
   };
 
   useEffect(async () => {
     const stream = await getUserStream();
-    stream.getVideoTracks()[0].enabled = false;
-    props.setMainStream(stream);
-
-    connectedRef.on("value", (snap) => {
-      if (snap.val()) {
-        const defaultPreference = {
-          audio: true,
-          video: false,
-          screen: false,
-        };
-        const userStatusRef = participantRef.push({
-          userName,
-          preferences: defaultPreference,
-        });
-        props.setUser({
-          [userStatusRef.key]: { name: userName, ...defaultPreference },
-        });
-        userStatusRef.onDisconnect().remove();
-      }
-    });
-  }, []);
+    if (stream) {
+      // Если поток доступен, устанавливаем его и отправляем данные о пользователе
+      props.setMainStream(stream);
+  
+      connectedRef.on("value", (snap) => {
+        if (snap.val()) {
+          const defaultPreference = {
+            audio: true,
+            video: false,
+            screen: false,
+          };
+          const userStatusRef = participantRef.push({
+            userName,
+            preferences: defaultPreference,
+          });
+          props.setUser({
+            [userStatusRef.key]: { name: userName, ...defaultPreference },
+          });
+          userStatusRef.onDisconnect().remove();
+        }
+      });
+    } else {
+      // Если поток не доступен, предложим альтернативу без видео
+      const alternativeStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      props.setMainStream(alternativeStream);
+  
+      // Можно также предложить пользователю сообщение о том, что камера недоступна и будет использоваться только аудио
+      console.log('Камера недоступна или не обнаружена. Будет использован только аудиопоток.');
+  
+      connectedRef.on("value", (snap) => {
+        if (snap.val()) {
+          const defaultPreference = {
+            audio: true,
+            video: false,
+            screen: false,
+          };
+          const userStatusRef = participantRef.push({
+            userName,
+            preferences: defaultPreference,
+          });
+          props.setUser({
+            [userStatusRef.key]: { name: userName, ...defaultPreference },
+          });
+          userStatusRef.onDisconnect().remove();
+        }
+      });
+    }
+  }, []);  
 
   const connectedRef = db.database().ref(".info/connected");
   const participantRef = firepadRef.child("participants");

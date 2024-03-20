@@ -3,6 +3,7 @@ const express = require('express');
 const expressApp = express();
 const https = require('https');
 const fs = require('fs');
+const bodyParser = require('body-parser');
 
 const option = {
         key: fs.readFileSync("./13.42.37.29-key.pem"),
@@ -21,35 +22,28 @@ const io = require('socket.io')(httpsServer, {
 
 
 
+
 // Структура данных для хранения информации о сессиях досок
 const sessions = {};
 
-
-expressApp.get("/", (req,res) => {
-	res.send("WELCOME TO CoLearning! /n We are happy to see you here. Open https://13.42.37.29:3000 to start CoLearning session")
-});
-
 io.on('connection', (socket) => {
-    
-    // Обработчик подключения к сессии
     const sessionId = socket.handshake.query.sessionId;
-
     console.log('К нам подключился пользователь!', sessionId);
 
     if (sessionId) {
         if (sessions[sessionId]) {
             console.log('Сессия существует');
-            // Подключаем пользователя к существующей сессии
-            sessions[sessionId].users.push(socket.id);
             socket.join(sessionId);
+            const taskImg = sessions[sessionId].task || ""; // Получаем изображение задания или пустую строку
+            socket.emit('current-task', taskImg);
         } else {
             console.log('Создаем новую сессию');
-            // Создаем новую сессию
             sessions[sessionId] = {
                 users: [socket.id],
                 images: []
             };
             socket.join(sessionId);
+            socket.emit('current-task', "");
         }
     } else {
         console.log('Идентификатор сессии не найден');
@@ -70,7 +64,7 @@ io.on('connection', (socket) => {
             }
         }
     });
-    
+
     // Обработчик для получения данных изображения от клиента
     socket.on('image-data', (data) => {
         console.log('Получены данные изображения');
@@ -92,12 +86,30 @@ expressApp.get('*', function (req, res) {
     res.sendFile(path.join(__dirname, '../ui/build', 'index.html'));
 });  
 
+expressApp.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
+
+expressApp.use(bodyParser.json());
+expressApp.post('/upload-task-image', (req, res) => {
+    console.log("Knock")
+    const sessionId = req.body.sessionId;
+    const taskImage = req.body.taskImage;
+
+    if (sessionId && taskImage) {
+        sessions[sessionId].task = taskImage;
+        console.log('Изображение задания получено и сохранено в сессии:');
+        res.status(200).send('Изображение задания сохранено успешно.');
+    } else {
+        res.status(400).send('Отсутствуют обязательные параметры sessionId или taskImage.');
+    }
+});
 
 
-
-
-
-
-
-
-
+httpServer.listen(port, () => {
+    console.log('Server running at', port)
+});

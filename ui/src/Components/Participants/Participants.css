@@ -1,6 +1,8 @@
 .participants {
   display: grid;
+  /* grid-template-columns: repeat(var(--grid-size), 1fr); */
   grid-template-columns: repeat(var(--grid-size), 1fr);
+    grid-template-rows: repeat(var(--grid-size), calc(100% / var(--grid-size)));
   grid-gap: 20px;
   height: 36vh;
   padding: 10px;
@@ -8,8 +10,8 @@
 
 .participants img {
   border-radius: 50%;
-  height: 120px;
-  width: 120px;
+  height: 100%;
+  width: 100%;
 }
 
 @media (max-width: 800px) {

@@ -4,7 +4,6 @@ import { store } from "../index";
 const participantRef = firepadRef.child("participants");
 
 export const updatePreference = (userId, preference) => {
-  console.log("updatePreference");
   const currentParticipantRef = participantRef
     .child(userId)
     .child("preferences");
@@ -14,7 +13,6 @@ export const updatePreference = (userId, preference) => {
 };
 
 export const createOffer = async (peerConnection, receiverId, createdID) => {
-  console.log("createOffer");
   const currentParticipantRef = participantRef.child(receiverId);
   peerConnection.onicecandidate = (event) => {
     event.candidate &&
@@ -36,7 +34,6 @@ export const createOffer = async (peerConnection, receiverId, createdID) => {
 };
 
 export const initializeListensers = async (userId) => {
-  console.log("initializeListensers");
   const currentUserRef = participantRef.child(userId);
 
   currentUserRef.child("offers").on("child_added", async (snapshot) => {
@@ -77,7 +74,6 @@ export const initializeListensers = async (userId) => {
 };
 
 const createAnswer = async (otherUserId, userId) => {
-  console.log("createAnswer");
   const pc = store.getState().participants[otherUserId].peerConnection;
   const participantRef1 = participantRef.child(otherUserId);
   pc.onicecandidate = (event) => {

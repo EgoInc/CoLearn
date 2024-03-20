@@ -26,7 +26,7 @@ const MainPage = (props) => {
 
     reader.onload = function (event) {
       const base64String = event.target.result;
-      localStorage.setItem("imageData", base64String);
+      sessionStorage.setItem("imageData", base64String);
     };
 
     reader.readAsDataURL(imageFile);
@@ -40,7 +40,6 @@ const MainPage = (props) => {
   };
 
   const handleOkButtonClick = () => {
-    console.log("enter", nickname);
     setShowInput(false);
     localStorage.setItem("nickname", nickname);
     window.location.href = "/meeting/";
